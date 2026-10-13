@@ -2,11 +2,9 @@
    CONSTANTS
    ========================================================= */
 const IMG_BASE = "https://radiantoptimizer.app/product/games/";
+const LS_HISTORY = "holo_history";
+const LS_AUTH = "holo_auth";
 const IDLE_LIMIT = 1000 * 60 * 5; // 5 menit
-
-const LS_USERS = "holo_users";
-const LS_SESSION = "holo_session";
-const LS_HISTORY = "holo_history_";
 
 const CATEGORIES = [
   "Shooter", "Action", "Retro", "Sandbox", "RPG",
@@ -177,114 +175,64 @@ function escapeHtml(str) {
 }
 
 /* =========================================================
-   AUTH (localStorage)
+   AUTH — hanya password gate
    ========================================================= */
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem(LS_USERS) || "{}"); }
-  catch { return {}; }
+function setAuthOK() {
+  localStorage.setItem(LS_AUTH, JSON.stringify({ last: Date.now() }));
 }
 
-function saveUsers(users) {
-  localStorage.setItem(LS_USERS, JSON.stringify(users));
-}
-
-function registerUser(username, password) {
-  if (!username || !password) return { ok: false, msg: "Isi username & password." };
-  if (username.length < 3) return { ok: false, msg: "Username minimal 3 karakter." };
-  if (password.length < 4) return { ok: false, msg: "Password minimal 4 karakter." };
-
-  const users = getUsers();
-  if (users[username]) return { ok: false, msg: "Username sudah dipakai." };
-
-  users[username] = password;
-  saveUsers(users);
-  return { ok: true };
-}
-
-function loginUser(username, password) {
-  const users = getUsers();
-  if (!users[username]) return { ok: false, msg: "Username tidak ditemukan." };
-  if (users[username] !== password) return { ok: false, msg: "Password salah." };
-  return { ok: true };
-}
-
-function setSession(username) {
-  localStorage.setItem(LS_SESSION, JSON.stringify({
-    user: username,
-    last: Date.now()
-  }));
-}
-
-function touchSession() {
-  const s = getSession();
-  if (!s) return;
-  s.last = Date.now();
-  localStorage.setItem(LS_SESSION, JSON.stringify(s));
-}
-
-function getSession() {
+function touchAuth() {
+  const raw = localStorage.getItem(LS_AUTH);
+  if (!raw) return;
   try {
-    const raw = localStorage.getItem(LS_SESSION);
-    if (!raw) return null;
     const s = JSON.parse(raw);
-    if (!s.user || !s.last) return null;
+    s.last = Date.now();
+    localStorage.setItem(LS_AUTH, JSON.stringify(s));
+  } catch {}
+}
+
+function isAuthenticated() {
+  try {
+    const raw = localStorage.getItem(LS_AUTH);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (!s.last) return false;
     if (Date.now() - s.last > IDLE_LIMIT) {
-      localStorage.removeItem(LS_SESSION);
-      return null;
+      localStorage.removeItem(LS_AUTH);
+      return false;
     }
-    return s;
-  } catch { return null; }
-}
-
-function isLoggedIn() {
-  return getSession() !== null;
-}
-
-function currentUser() {
-  const s = getSession();
-  return s ? s.user : null;
-}
-
-function logout() {
-  localStorage.removeItem(LS_SESSION);
-  location.href = "index.html";
+    return true;
+  } catch { return false; }
 }
 
 /* =========================================================
-   HISTORY (per user)
+   HISTORY (global, bukan per-user)
    ========================================================= */
 function getHistory() {
-  const u = currentUser();
-  if (!u) return [];
-  try {
-    return JSON.parse(localStorage.getItem(LS_HISTORY + u) || "[]");
-  } catch { return []; }
+  try { return JSON.parse(localStorage.getItem(LS_HISTORY) || "[]"); }
+  catch { return []; }
 }
 
 function addHistory(slug) {
-  const u = currentUser();
-  if (!u) return;
   const game = games.find(g => g.slug === slug);
   if (!game) return;
 
   let hist = getHistory();
   hist = hist.filter(h => h.slug !== slug);
   hist.unshift({ slug, name: game.name, cat: game.cat, at: Date.now() });
-  hist = hist.slice(0, 20); // max 20
-  localStorage.setItem(LS_HISTORY + u, JSON.stringify(hist));
+  hist = hist.slice(0, 20);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(hist));
 }
 
 function clearHistory() {
-  const u = currentUser();
-  if (!u) return;
-  localStorage.removeItem(LS_HISTORY + u);
+  localStorage.removeItem(LS_HISTORY);
 }
 
 /* =========================================================
-   SESSION ACTIVITY TRACKER (auto refresh timer)
+   ACTIVITY TRACKER
    ========================================================= */
 ["click", "keydown", "touchstart", "mousemove"].forEach(evt => {
   document.addEventListener(evt, () => {
-    if (isLoggedIn()) touchSession();
+    if (isAuthenticated()) touchAuth();
   }, { passive: true });
 });
