@@ -1,14 +1,12 @@
-
-const IFRAME_TIMEOUT = 6000; // 6 detik
+const IFRAME_TIMEOUT = 6000;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Cek login
-  if (!isLoggedIn()) {
+  // Kalau belum login gate, balik ke index
+  if (!isAuthenticated()) {
     location.href = "index.html";
     return;
   }
 
-  // Ambil slug dari URL
   const params = new URLSearchParams(location.search);
   const slug = params.get("slug");
   const game = games.find(g => g.slug === slug);
@@ -19,16 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Update title & tombol buka tab baru
   document.title = game.name + " — Game Hub";
   document.getElementById("playerTitle").textContent = game.name;
   document.getElementById("openNewTab").href = game.url;
   document.getElementById("fallbackBtn").href = game.url;
 
-  // Catat riwayat
   addHistory(slug);
 
-  // Load game di iframe
   const frame = document.getElementById("gameFrame");
   const loading = document.getElementById("loading");
   const fallback = document.getElementById("fallback");
@@ -38,26 +33,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   frame.src = game.url;
 
-  // Tampilkan iframe setelah onload
   frame.addEventListener("load", () => {
     loaded = true;
     loading.classList.add("hidden");
     frame.classList.remove("hidden");
   });
 
-  // Kalau 6 detik belum muncul, tampilkan fallback
   setTimeout(() => {
     if (!loaded && !fallbackShown) {
       fallbackShown = true;
       loading.classList.add("hidden");
       fallback.classList.remove("hidden");
-
-      // Coba tetap tampilkan iframe di belakang (siapa tahu lambat)
       frame.classList.remove("hidden");
     }
   }, IFRAME_TIMEOUT);
 
-  // Tombol kembali — pakai history API biar smooth
   document.getElementById("backBtn").addEventListener("click", e => {
     e.preventDefault();
     if (document.referrer && document.referrer.includes("index.html")) {
