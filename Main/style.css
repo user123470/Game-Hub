@@ -397,6 +397,10 @@ main {
 .chip[data-cat="Racing"]   { --chip-color: #00bedc; }
 .chip[data-cat="Sports"]   { --chip-color: #aadc28; }
 .chip[data-cat="Adventure"]{ --chip-color: #b45adc; }
+.chip[data-cat="PC"]       { --chip-color: #4ecdc4; }
+.chip[data-cat="Neo Geo"]  { --chip-color: #ff6b6b; }
+.chip[data-cat="Capcom"]   { --chip-color: #ffe66d; }
+.chip[data-cat="Arcade"]   { --chip-color: #a06cd5; }
 
 .grid {
   display: grid;
@@ -490,6 +494,10 @@ main {
 .card-cat[data-cat="Racing"]    { background: rgba(0,190,220,0.9); }
 .card-cat[data-cat="Sports"]    { background: rgba(170,220,40,0.95); color: #131517; }
 .card-cat[data-cat="Adventure"] { background: rgba(180,90,220,0.9); }
+.card-cat[data-cat="PC"]        { background: rgba(78,205,196,0.9); }
+.card-cat[data-cat="Neo Geo"]   { background: rgba(255,107,107,0.9); }
+.card-cat[data-cat="Capcom"]    { background: rgba(255,230,109,0.95); color: #1a1400; }
+.card-cat[data-cat="Arcade"]    { background: rgba(160,108,213,0.9); }
 
 .card-open-tab {
   position: absolute;
