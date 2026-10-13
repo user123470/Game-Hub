@@ -31,9 +31,9 @@ body {
 .hidden { display: none !important; }
 
 /* =========================================================
-   AUTH SCREEN
+   SCREEN BASE
    ========================================================= */
-#gate {
+.screen {
   position: fixed;
   inset: 0;
   display: grid;
@@ -82,40 +82,7 @@ body {
   50%      { box-shadow: 0 0 70px var(--accent-glow), 0 8px 24px rgba(0,0,0,0.4); }
 }
 
-.auth-tabs {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  background: var(--bg);
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.auth-tab {
-  flex: 1;
-  padding: 10px;
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 700;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-
-.auth-tab:hover { color: var(--text); }
-
-.auth-tab.active {
-  background: var(--surface-hi);
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-#authForm { display: flex; flex-direction: column; gap: 10px; }
-
-#username, #password {
+#gatePw {
   width: 100%;
   padding: 14px 16px;
   font-size: 15px;
@@ -126,27 +93,27 @@ body {
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   font-family: inherit;
+  margin-bottom: 10px;
+  text-align: center;
+  letter-spacing: 0.15em;
 }
 
-#username::placeholder, #password::placeholder { color: var(--muted); }
+#gatePw::placeholder { color: var(--muted); }
 
-#username:focus, #password:focus {
+#gatePw:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(209,254,23,0.12);
 }
 
-#username:-webkit-autofill,
-#username:-webkit-autofill:focus,
-#password:-webkit-autofill,
-#password:-webkit-autofill:focus {
+#gatePw:-webkit-autofill,
+#gatePw:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--text) !important;
   -webkit-box-shadow: 0 0 0 1000px var(--bg) inset !important;
 }
 
-#authBtn {
+#gateBtn {
   width: 100%;
   padding: 15px;
-  margin-top: 4px;
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.2em;
@@ -159,10 +126,11 @@ body {
   transition: transform 0.1s, background 0.15s, box-shadow 0.2s;
   font-family: inherit;
   box-shadow: 0 0 30px rgba(209,254,23,0.25);
+  margin-top: 4px;
 }
 
-#authBtn:hover { background: #b8e013; box-shadow: 0 0 40px rgba(209,254,23,0.4); }
-#authBtn:active { transform: scale(0.98); }
+#gateBtn:hover { background: #b8e013; box-shadow: 0 0 40px rgba(209,254,23,0.4); }
+#gateBtn:active { transform: scale(0.98); }
 
 .err {
   color: var(--danger);
@@ -271,41 +239,6 @@ body {
   -webkit-box-shadow: 0 0 0 1000px var(--surface) inset !important;
 }
 
-.user-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 5px 5px 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-}
-
-.user-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.icon-btn {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: var(--danger);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.icon-btn:hover { background: rgba(255,92,92,0.15); }
-
 main {
   flex: 1;
   padding: 24px;
@@ -388,7 +321,6 @@ main {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--border);
-  position: relative;
 }
 
 .history-thumb img {
@@ -726,26 +658,17 @@ footer {
 .player-fallback {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
   text-align: center;
   padding: 20px;
   z-index: 20;
   background:
     radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,92,92,0.08), transparent 60%),
     var(--bg);
-}
-
-.player-fallback > div, .player-fallback > h2, .player-fallback > p, .player-fallback > a {
-  grid-column: 1; grid-row: 1;
-}
-
-.player-fallback {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 14px;
 }
 
 .fallback-icon { font-size: 56px; opacity: 0.7; }
@@ -803,7 +726,6 @@ footer {
   .topbar { padding: 12px 14px; gap: 10px; flex-wrap: wrap; }
   .brand-name { display: none; }
   .search-wrap { order: 3; flex-basis: 100%; max-width: none; }
-  .user-box { padding: 4px 4px 4px 10px; }
   main { padding: 16px 12px; }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
