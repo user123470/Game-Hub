@@ -224,10 +224,7 @@ if (!isPlayerPage) {
   function showVerifikasi() {
     const overlay = document.getElementById("verifikasiOverlay");
     overlay.classList.remove("hidden");
-    // Sembunyikan lagi setelah 2 detik
-    setTimeout(() => {
-      overlay.classList.add("hidden");
-    }, 2000);
+    setTimeout(() => overlay.classList.add("hidden"), 2000);
   }
 
   function tryGate() {
@@ -245,7 +242,6 @@ if (!isPlayerPage) {
       document.getElementById("gatePw").value = "";
       card.classList.add("shake");
       setTimeout(() => card.classList.remove("shake"), 400);
-      // ✅ Tampilkan gambar verifikasi
       showVerifikasi();
     }
   }
@@ -319,18 +315,35 @@ if (!isPlayerPage) {
 
     grid.innerHTML = list.map(g => {
       const init = g.name.trim().charAt(0).toUpperCase();
-      return `<a class="card" href="play.html?slug=${encodeURIComponent(g.slug)}">
-        <div class="card-thumb">
-          <div class="card-cat" data-cat="${g.cat}">${g.cat}</div>
-          <div class="initial">${init}</div>
-          <img src="${IMG_BASE}${g.slug}.webp" alt="" loading="lazy" referrerpolicy="no-referrer"
-               onload="this.classList.add('loaded')" onerror="this.remove()">
-        </div>
-        <div class="card-body">
-          <div class="card-title">${escapeHtml(g.name)}</div>
-        </div>
-      </a>`;
+      return `<div class="card">
+        <a href="play.html?slug=${encodeURIComponent(g.slug)}" class="card-link">
+          <div class="card-thumb">
+            <div class="card-cat" data-cat="${g.cat}">${g.cat}</div>
+            <div class="initial">${init}</div>
+            <img src="${IMG_BASE}${g.slug}.webp" alt="" loading="lazy" referrerpolicy="no-referrer"
+                 onload="this.classList.add('loaded')" onerror="this.remove()">
+          </div>
+          <div class="card-body">
+            <div class="card-title">${escapeHtml(g.name)}</div>
+          </div>
+        </a>
+        <button class="card-open-tab" data-url="${escapeHtml(g.url)}" title="Buka di Tab Baru">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+            <polyline points="15 3 21 3 21 9"/>
+            <line x1="10" y1="14" x2="21" y2="3"/>
+          </svg>
+        </button>
+      </div>`;
     }).join("");
+
+    grid.querySelectorAll(".card-open-tab").forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.open(btn.dataset.url, "_blank", "noopener");
+      };
+    });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -420,5 +433,57 @@ if (isPlayerPage) {
       e.preventDefault();
       location.href = "index.html";
     });
+
+    /* FULLSCREEN */
+    const fsBtn = document.getElementById("fullscreenBtn");
+    const fsIcon = document.getElementById("fsIcon");
+    const body = document.body;
+
+    const iconExpand = `<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>`;
+    const iconShrink = `<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>`;
+
+    function isFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function updateFsIcon() {
+      fsIcon.innerHTML = isFullscreen() ? iconShrink : iconExpand;
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!isFullscreen()) {
+          if (frame.requestFullscreen || frame.webkitRequestFullscreen) {
+            try {
+              await (frame.requestFullscreen ? frame.requestFullscreen() : Promise.resolve(frame.webkitRequestFullscreen()));
+              updateFsIcon();
+              return;
+            } catch (e) {}
+          }
+          if (body.requestFullscreen) await body.requestFullscreen();
+          else if (body.webkitRequestFullscreen) body.webkitRequestFullscreen();
+          else if (body.msRequestFullscreen) body.msRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) await document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+        updateFsIcon();
+      } catch (err) {
+        console.warn("Fullscreen gagal:", err);
+      }
+    }
+
+    fsBtn.addEventListener("click", toggleFullscreen);
+
+    ["fullscreenchange", "webkitfullscreenchange"].forEach(evt => {
+      document.addEventListener(evt, updateFsIcon);
+    });
+
+    document.addEventListener("keydown", e => {
+      if ((e.key === "f" || e.key === "F") && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        toggleFullscreen();
+      }
+    });
   });
-   }
+  }
