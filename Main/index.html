@@ -3,18 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Library</title>
+<title>Game Hub</title>
 <link rel="preconnect" href="https://radiantoptimizer.app">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ========== LOGIN (TANPA TEKS) ========== -->
+<!-- ========== AUTH SCREEN ========== -->
 <div id="gate">
   <div class="gate-card">
     <div class="gate-logo">⚡</div>
-    <input type="password" id="pw" autocomplete="off" autofocus>
-    <button id="loginBtn" type="button">ENTER</button>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Masuk</button>
+      <button class="auth-tab" data-tab="register">Daftar</button>
+    </div>
+
+    <form id="authForm" autocomplete="off">
+      <input type="text" id="username" placeholder="Username" autocomplete="off" required>
+      <input type="password" id="password" placeholder="Password" autocomplete="off" required>
+      <button type="submit" id="authBtn">MASUK</button>
+    </form>
+
     <p id="err" class="err"></p>
   </div>
 </div>
@@ -24,6 +34,7 @@
   <header class="topbar">
     <div class="brand">
       <span class="brand-icon">⚡</span>
+      <span class="brand-name" id="brandName">Game Hub</span>
     </div>
 
     <div class="search-wrap">
@@ -33,20 +44,40 @@
       </svg>
       <input type="text" id="search" placeholder="Cari game..." autocomplete="off">
     </div>
+
+    <div class="user-box">
+      <span class="user-name" id="userName">user</span>
+      <button id="logoutBtn" class="icon-btn" title="Keluar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main>
+    <!-- RIWAYAT -->
+    <section id="historySection" class="history-section hidden">
+      <div class="section-head">
+        <h2>Terakhir Dimainkan</h2>
+        <button id="clearHistoryBtn" class="text-btn">Hapus riwayat</button>
+      </div>
+      <div id="historyGrid" class="history-row"></div>
+    </section>
+
+    <!-- FILTER -->
     <div class="meta">
       <span id="count">Memuat...</span>
     </div>
-
     <div id="chips" class="chips"></div>
 
+    <!-- GRID -->
     <div id="grid" class="grid"></div>
-
     <div id="empty" class="empty hidden">
       <div class="empty-icon">🔍</div>
-      <p>Tidak ada game yang cocok dengan pencarianmu.</p>
+      <p>Tidak ada game yang cocok.</p>
     </div>
   </main>
 
@@ -55,6 +86,7 @@
   </footer>
 </div>
 
+<script src="data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
