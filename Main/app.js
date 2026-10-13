@@ -1,47 +1,29 @@
+const GATE_PASSWORD = "Skibidi123XD";
+
 let currentCat = "All";
 let currentQuery = "";
-let authMode = "login"; // "login" atau "register"
 
 /* =========================================================
-   AUTH UI
+   GATE
    ========================================================= */
-function setAuthMode(mode) {
-  authMode = mode;
-  document.querySelectorAll(".auth-tab").forEach(t => {
-    t.classList.toggle("active", t.dataset.tab === mode);
-  });
-  document.getElementById("authBtn").textContent = mode === "login" ? "MASUK" : "DAFTAR";
-  document.getElementById("err").textContent = "";
-}
+function tryGate() {
+  const input = document.getElementById("gatePw").value;
+  const err = document.getElementById("gateErr");
+  const card = document.querySelector("#gate .gate-card");
 
-function handleAuth(e) {
-  e.preventDefault();
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
-  const err = document.getElementById("err");
-  const card = document.querySelector(".gate-card");
+  if (!input) {
+    err.textContent = "Password tidak boleh kosong.";
+    return;
+  }
 
-  if (authMode === "register") {
-    const r = registerUser(username, password);
-    if (!r.ok) {
-      err.textContent = r.msg;
-      card.classList.add("shake");
-      setTimeout(() => card.classList.remove("shake"), 400);
-      return;
-    }
-    // auto login setelah daftar
-    setSession(username);
+  if (input === GATE_PASSWORD) {
+    setAuthOK();
     openApp();
   } else {
-    const r = loginUser(username, password);
-    if (!r.ok) {
-      err.textContent = r.msg;
-      card.classList.add("shake");
-      setTimeout(() => card.classList.remove("shake"), 400);
-      return;
-    }
-    setSession(username);
-    openApp();
+    err.textContent = "Password salah. Coba lagi.";
+    document.getElementById("gatePw").value = "";
+    card.classList.add("shake");
+    setTimeout(() => card.classList.remove("shake"), 400);
   }
 }
 
@@ -49,13 +31,8 @@ function handleAuth(e) {
    OPEN APP
    ========================================================= */
 function openApp() {
-  const u = currentUser();
-  document.getElementById("brandName").textContent = "Game Hub";
-  document.getElementById("userName").textContent = u;
-
   document.getElementById("gate").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-
   renderChips();
   renderHistory();
   render();
@@ -180,18 +157,11 @@ function render() {
    INIT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
-  // Auth tabs
-  document.querySelectorAll(".auth-tab").forEach(tab => {
-    tab.addEventListener("click", () => setAuthMode(tab.dataset.tab));
+  document.getElementById("gateBtn").addEventListener("click", tryGate);
+  document.getElementById("gatePw").addEventListener("keydown", e => {
+    if (e.key === "Enter") tryGate();
   });
 
-  // Auth form
-  document.getElementById("authForm").addEventListener("submit", handleAuth);
-
-  // Logout
-  document.getElementById("logoutBtn").addEventListener("click", logout);
-
-  // Clear history
   document.getElementById("clearHistoryBtn").addEventListener("click", () => {
     if (confirm("Hapus semua riwayat permainan?")) {
       clearHistory();
@@ -199,7 +169,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Search
   let timer;
   document.getElementById("search").addEventListener("input", e => {
     currentQuery = e.target.value;
@@ -209,9 +178,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("totalFoot").textContent = games.length;
 
-  // Auto login
-  if (isLoggedIn()) {
-    touchSession();
+  // Auto-login kalau masih dalam 5 menit idle
+  if (isAuthenticated()) {
+    touchAuth();
     openApp();
   }
 });
