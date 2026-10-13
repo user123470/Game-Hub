@@ -221,6 +221,15 @@ if (!isPlayerPage) {
     renderGrid();
   }
 
+  function showVerifikasi() {
+    const overlay = document.getElementById("verifikasiOverlay");
+    overlay.classList.remove("hidden");
+    // Sembunyikan lagi setelah 2 detik
+    setTimeout(() => {
+      overlay.classList.add("hidden");
+    }, 2000);
+  }
+
   function tryGate() {
     const input = document.getElementById("gatePw").value;
     const err = document.getElementById("gateErr");
@@ -236,6 +245,8 @@ if (!isPlayerPage) {
       document.getElementById("gatePw").value = "";
       card.classList.add("shake");
       setTimeout(() => card.classList.remove("shake"), 400);
+      // ✅ Tampilkan gambar verifikasi
+      showVerifikasi();
     }
   }
 
@@ -410,4 +421,4 @@ if (isPlayerPage) {
       location.href = "index.html";
     });
   });
-  }
+   }
