@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -30,18 +29,15 @@
 </div>
 
 <div class="player-wrap">
-  <!-- LOADING -->
   <div id="loading" class="player-loading">
     <div class="spinner"></div>
     <p>Memuat game...</p>
     <small id="loadingHint">Jika game tidak muncul dalam 6 detik, akan ada tombol alternatif.</small>
   </div>
 
-  <!-- IFRAME -->
   <iframe id="gameFrame" class="game-frame hidden" allowfullscreen
           allow="autoplay; fullscreen; gamepad; microphone; camera; clipboard-write"></iframe>
 
-  <!-- FALLBACK -->
   <div id="fallback" class="player-fallback hidden">
     <div class="fallback-icon">🚫</div>
     <h2>Game ini tidak bisa di-embed</h2>
