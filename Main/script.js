@@ -9,6 +9,21 @@ const IDLE_MS = 1000 * 60 * 5;
 const WASM_BASE = "https://wasmarcade.com";
 const WASM_RIP = "https://wasm.rip/files";
 
+/* Host yang melarang di-embed (X-Frame-Options / frame-ancestors).
+   Kalau kamu lihat ikon muka sedih di player, tambahin domainnya di sini
+   supaya langsung muncul tombol "Buka di Tab Baru" tanpa nunggu. */
+const NO_EMBED_HOSTS = [
+  "nytimes.com",
+  "web.archive.org"
+];
+
+function canEmbed(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return !NO_EMBED_HOSTS.some(h => host === h || host.endsWith("." + h));
+  } catch { return true; }
+}
+
 const CATEGORIES = [
   "PC", "Neo Geo", "Capcom", "Arcade",
   "Shooter", "Action", "Retro", "Sandbox", "RPG",
@@ -676,21 +691,30 @@ if (isPlayerPage) {
     let loaded = false;
     let fallbackShown = false;
 
-    frame.src = game.url;
-
-    frame.addEventListener("load", () => {
-      loaded = true;
+    function showFallback() {
+      if (fallbackShown) return;
+      fallbackShown = true;
       loading.classList.add("hidden");
-      frame.classList.remove("hidden");
-    });
+      frame.classList.add("hidden");
+      frame.src = "about:blank";
+      fallback.classList.remove("hidden");
+    }
 
-    setTimeout(() => {
-      if (!loaded && !fallbackShown) {
-        fallbackShown = true;
+    if (!canEmbed(game.url)) {
+      showFallback();
+    } else {
+      frame.setAttribute("referrerpolicy", "no-referrer");
+      frame.addEventListener("load", () => {
+        if (fallbackShown) return;
+        loaded = true;
         loading.classList.add("hidden");
-        fallback.classList.remove("hidden");
-      }
-    }, 6000);
+        frame.classList.remove("hidden");
+      });
+      frame.addEventListener("error", showFallback);
+      frame.src = game.url;
+
+      setTimeout(() => { if (!loaded) showFallback(); }, 8000);
+    }
 
     document.getElementById("backBtn").addEventListener("click", e => {
       e.preventDefault();
