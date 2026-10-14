@@ -1,0 +1,11 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Referrer-Policy", "value": "no-referrer-when-downgrade" },
+        { "key": "Permissions-Policy", "value": "fullscreen=*, gamepad=*, autoplay=*" }
+      ]
+    }
+  ]
+}
